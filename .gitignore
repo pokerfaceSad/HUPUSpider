@@ -21,6 +21,7 @@ sdist/
 var/
 wheels/
 *.egg-info/
+logs/
 .installed.cfg
 *.egg
 MANIFEST
@@ -62,6 +63,11 @@ instance/
 
 # Scrapy stuff:
 .scrapy
+dbs/
+project.egg-info/
+Test/
+spider.conf
+settings.py
 
 # Sphinx documentation
 docs/_build/
