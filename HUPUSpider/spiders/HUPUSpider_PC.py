@@ -1,14 +1,18 @@
+import datetime
+
 import scrapy
 from scrapy.spiders import CrawlSpider
-
+import logging
 from HUPUSpider.items import HUPUSpiderItem
-
+from HUPUSpider import settings
 
 # 虎扑PC端页面爬虫
 class HUPUSpider_PC(CrawlSpider):
     name = "HUPUSpider_PC"
 
-    def __init__(self, **kwargs):
+    def __init__(self, index_range,**kwargs):
+        # 爬取页数
+        self.index_range = int(index_range)
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
         }
@@ -29,7 +33,7 @@ class HUPUSpider_PC(CrawlSpider):
                         ' Hm_lpvt_39fc58a7ab8a311f2f6ca4dc1222a96e': '1538202861'}
 
     def start_requests(self):
-        for i in range(1, 20 + 1):
+        for i in range(1, self.index_range + 1):
             # 有cookie的话可以设置cookie
             # scrapy.Request("http://www.xxxxxxx.com/user/login", meta={'cookiejar': 1}, headers=self.headers,
             #                callback=self.post_login)
@@ -82,18 +86,65 @@ class HUPUSpider_PC(CrawlSpider):
     '''
     def parse_post(self, response):
         # 帖子内容
-        content = response.xpath('string(//*[@id="tpc"]/div/div[2]/table[1]/tbody/tr/td)').extract()[0]
+        post_content = response.xpath('string(//*[@id="tpc"]/div/div[2]/table[1]/tbody/tr/td)').extract()[0]
         # 将帖子内容中无效字符滤除
         pass
         # 亮评列表
         bright_reply_list = response.xpath('//*[@id="readfloor"]/div')
         # 将亮评列表加工成字典类型
-        for bright_reply in bright_reply_list:
+        # 亮评字典格式
+        '''
+        bright_reply_dict:
+        {
+            bright_reply_num:xx,
+            bright_reply_1:
+            {
+                username:xxx,
+                uid:xxx,
+                bright_num:,
+                reply_content
+            },
+            bright_reply_2:
+            {
+                username:xxx,
+                uid:xxx,
+                bright_num:,
+                reply_content
+            }
+
+
+        }
+        '''
+        bright_reply_dict = {'bright_reply_num': len(bright_reply_list)}
+        for index, bright_reply in enumerate(bright_reply_list):
             # 用户名
-            username = bright_reply.xpath('.//div[@uname]/@uname').extract()
+            username = bright_reply.xpath('.//div[@uname]/@uname').extract()[0]
             # 用户标识
-            uid = bright_reply.xpath('.//div[@uname]/@uid').extract()
+            uid = bright_reply.xpath('.//div[@uname]/@uid').extract()[0]
             # 点亮数
-            bright_num = bright_reply.xpath('./div[2]/div[1]/div[1]/span[3]/span/span/text()').extract()
+            try:
+                bright_num = bright_reply.xpath('.//*[@class="stime"]/text()').extract()[1]
+            except BaseException as e:
+                logging.error(e)
+                logging.error("solving bright num occur an error")
+                logging.error(bright_reply.extract()[0])
             # 评论内容
-            reply_content = bright_reply.xpath('string(./div[2]/table/tbody/tr/td)').extract()
+            try:
+                reply_content = bright_reply.xpath('string(./div[2]/table/tbody/tr/td)').extract()[0]
+            except BaseException as e:
+                logging.error(e)
+                logging.error("solving reply content occur an error")
+                logging.error(bright_reply.extract()[0])
+
+            bright_reply_dict['bright_reply_%d' % (index+1)] = {
+                'username': username,
+                'uid': uid,
+                'bright_num': bright_num,
+                'reply_content': reply_content,
+            }
+        item = response.meta['tmpItem']
+        item['bright_reply_num'] = len(bright_reply_list)
+        item['post_content'] = post_content
+        item['bright_reply_dict'] = bright_reply_dict
+        yield item
+
