@@ -72,8 +72,8 @@ class HUPUSpider_PC(CrawlSpider):
             item = HUPUSpiderItem()
             item["title"] = title
             item["url"] = url
-            item['reply_num'] = reply_num
-            item['browse_num'] = browse_num
+            item['reply_num'] = int(reply_num)
+            item['browse_num'] = int(browse_num)
             item['author'] = authorID
             item['publish_time'] = publish_time
             # 发起新的Request 获取帖子内容和亮评内容
