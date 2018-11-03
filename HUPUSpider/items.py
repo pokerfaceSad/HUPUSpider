@@ -29,4 +29,6 @@ class HUPUSpiderItem(scrapy.Item):
     post_content = scrapy.Field()
     # 亮评列表
     bright_reply_dict = scrapy.Field()
+    # 抓取时间
+    crawl_time = scrapy.Field()
 

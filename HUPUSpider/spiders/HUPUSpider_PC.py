@@ -1,17 +1,20 @@
 import datetime
 
 import scrapy
+from pymongo import MongoClient
 from scrapy.spiders import CrawlSpider
 import logging
 from HUPUSpider.items import HUPUSpiderItem
 from HUPUSpider import settings
 
+
 # 虎扑PC端页面爬虫
 class HUPUSpider_PC(CrawlSpider):
     name = "HUPUSpider_PC"
 
-    def __init__(self, index_range,**kwargs):
+    def __init__(self, index_range, **kwargs):
         # 爬取页数
+        self.start_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
         self.index_range = int(index_range)
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
@@ -42,6 +45,7 @@ class HUPUSpider_PC(CrawlSpider):
     '''
     从论坛每一页解析出所有帖子的基本信息
     '''
+
     def parse(self, response):
         # 先提取出所有帖子 再根据类型不同进行分析
         post_list = response.xpath('//*[@id="ajaxtable"]/div[1]/ul/li')
@@ -76,14 +80,34 @@ class HUPUSpider_PC(CrawlSpider):
             item['browse_num'] = int(browse_num)
             item['author'] = authorID
             item['publish_time'] = publish_time
+            crawl_time = self.query_crawl_time(url)
+            if crawl_time is None:
+                crawl_time = self.start_time
+            else:
+                crawl_time = crawl_time + ',' + self.start_time
+            item['crawl_time'] = crawl_time
             # 发起新的Request 获取帖子内容和亮评内容
             # 将还没有获取到帖子内容的Item通过meta传递
             yield scrapy.Request('http://bbs.hupu.com/' + url, meta={'tmpItem': item}, headers=self.headers,
                                  cookies=self.cookies, callback=self.parse_post)
 
     '''
+    在数据库中查询帖子是否已经存在 如果存在要将原来的抓取时间标记保留
+    '''
+    def query_crawl_time(self, url):
+        client = MongoClient("mongodb://%s:%s@%s:%s/" % (
+        settings.DB_USER, settings.DB_PWD, settings.DB_HOST, settings.DB_PORT))  # 连接到服务器
+        Data_Collection = client.get_database("HUPU_DB").get_collection("POST_COL")  # 得到数据库中的集合
+        post = Data_Collection.find({'_id': url})
+        if post.count() == 0:
+            return None
+        else:
+            return post[0]['crawl_time']
+
+    '''
     解析帖子内容
     '''
+
     def parse_post(self, response):
         # 帖子内容
         post_content = response.xpath('string(//*[@id="tpc"]/div/div[2]/table[1]/tbody/tr/td)').extract()[0]
@@ -136,7 +160,7 @@ class HUPUSpider_PC(CrawlSpider):
                 logging.error("solving reply content occur an error")
                 logging.error(bright_reply.extract()[0])
 
-            bright_reply_dict['bright_reply_%d' % (index+1)] = {
+            bright_reply_dict['bright_reply_%d' % (index + 1)] = {
                 'username': username,
                 'uid': uid,
                 'bright_num': bright_num,
