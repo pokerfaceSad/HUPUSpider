@@ -1,5 +1,4 @@
-import os
-import re
+﻿import re
 import numpy as np
 import jieba.analyse
 from zhon.hanzi import punctuation
