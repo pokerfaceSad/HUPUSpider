@@ -1,3 +1,4 @@
+import os
 import re
 import numpy as np
 import jieba.analyse
@@ -23,9 +24,9 @@ def word_cloud_generate(Date):
     else:
         return 0
     Weight_List = np.zeros((1, Size_Post[k]))  # 类似于词频的权重数组
-    for i in range(0, Size_Post[0]):
+    for i in range(0, Size_Post[k]):
         # 去除中文符号
-        temp = "".join(jieba.lcut(re.sub(r"([%s])+" % punctuation, "", Collection[0][i]["post_content"]), cut_all=False))
+        temp = "".join(jieba.lcut(re.sub(r"([%s])+" % punctuation, "", Collection[k][i]["post_content"]), cut_all=False))
         # 去除帖子中含有的一些标志词： ZT（转贴） ZS（字数） TX等无实际意义的词
         temp = re.sub(r"([Zz][Tt]|[Zz][Ss]|[Tt][Xx]|[Jj][Rr]|[.]{1,6}|\n|[A-Za-z_]+|客户端|"
                       r"视频无法播放浏览器版本过低请升级浏览器或者使用其他浏览器|"
@@ -34,11 +35,11 @@ def word_cloud_generate(Date):
         # 字典调整 加入有可能成词的中文词和停用词表
         jieba.add_word("锁屏", freq=10)
         jieba.add_word("晒一下", freq=10)
-        jieba.analyse.set_stop_words("%s" % settings.Stop_Words_Path)
+        jieba.analyse.set_stop_words("%sStop_words.txt" % settings.Stop_Words_Path)
 
         Title_List.append(jieba.analyse.extract_tags(temp, topK=3, withWeight=False, allowPOS=()))
         # 给帖子的点亮数和回复数分配不同的权重（数量级在同一水平）
-        Weight_List[0][i] = Collection[0][i]["reply_num"] * 0.1 + Collection[0][i]["bright_reply_num"] * 0.9
+        Weight_List[0][i] = Collection[k][i]["reply_num"] * 0.1 + Collection[k][i]["bright_reply_num"] * 0.9
     Weight_List = Weight_List/sum((Weight_List[0]))
 
     #  生成所需要的字典Dict

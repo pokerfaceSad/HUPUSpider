@@ -22,6 +22,7 @@ def filtered_data():
             print("Collecting Data Over")
             break
         else:
+            print("Is Collecting")
             Collection.append(Table)
             Size_Post.append(Size)
             Date_List.append(settings.Start_Time)
