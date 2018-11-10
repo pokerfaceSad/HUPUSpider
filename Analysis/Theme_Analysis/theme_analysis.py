@@ -1,5 +1,4 @@
-﻿import re
-import numpy as np
+﻿import numpy as np
 import jieba.analyse
 from zhon.hanzi import punctuation
 from PIL import Image
