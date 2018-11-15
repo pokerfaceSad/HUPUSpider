@@ -11,8 +11,8 @@ class HupuspiderPipeline(object):
     def __init__(self):
         url = "mongodb://%s:%s@%s:%s/" % (settings.DB_USER, settings.DB_PWD, settings.DB_HOST, settings.DB_PORT)
         self.dbClient = myclient = pymongo.MongoClient(url)
-        mydb = self.dbClient["HUPU_DB"]
-        self.mycol = mydb["POST_COL"]
+        mydb = self.dbClient[settings.DB_CLIENT]
+        self.mycol = mydb[settings.DB_COL]
 
     def process_item(self, item, spider):
         temp = dict(item)

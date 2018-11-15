@@ -12,9 +12,12 @@ from HUPUSpider import settings
 class HUPUSpider_PC(CrawlSpider):
     name = "HUPUSpider_PC"
 
-    def __init__(self, index_range, **kwargs):
+    def __init__(self, part, index_range, **kwargs):
         # 爬取页数
         self.start_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+        self.part = str(part)
+        # 根据爬取的板块确定数据库集合名称
+        settings.DB_COL = str.upper(self.part) + '_COL'
         self.index_range = int(index_range)
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'
@@ -40,7 +43,7 @@ class HUPUSpider_PC(CrawlSpider):
             # 有cookie的话可以设置cookie
             # scrapy.Request("http://www.xxxxxxx.com/user/login", meta={'cookiejar': 1}, headers=self.headers,
             #                callback=self.post_login)
-            yield scrapy.Request('http://bbs.hupu.com/bxj-' + str(i), headers=self.headers, cookies=self.cookies)
+            yield scrapy.Request('https://bbs.hupu.com/' + self.part + '-' + str(i), headers=self.headers, cookies=self.cookies)
 
     '''
     从论坛每一页解析出所有帖子的基本信息
@@ -97,7 +100,7 @@ class HUPUSpider_PC(CrawlSpider):
     def query_crawl_time(self, url):
         client = MongoClient("mongodb://%s:%s@%s:%s/" % (
         settings.DB_USER, settings.DB_PWD, settings.DB_HOST, settings.DB_PORT))  # 连接到服务器
-        Data_Collection = client.get_database("HUPU_DB").get_collection("POST_COL")  # 得到数据库中的集合
+        Data_Collection = client.get_database(settings.DB_CLIENT).get_collection(settings.DB_COL)  # 得到数据库中的集合
         post = Data_Collection.find({'_id': url})
         if post.count() == 0:
             return None
