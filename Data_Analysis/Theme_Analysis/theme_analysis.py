@@ -4,7 +4,7 @@ import jieba.analyse
 from zhon.hanzi import punctuation
 from PIL import Image
 from wordcloud import WordCloud
-#  from matplotlib import pyplot
+#from matplotlib import pyplot
 import settings
 from Data_Preprocessing.Filtered_Data import filtered_data
 
@@ -159,14 +159,14 @@ class ThemeAnalysis(object):
         wc = WordCloud(
             font_path="%s" % settings.Font_Path,  # 字体采用微软雅黑
             prefer_horizontal=0.5,  # 词语水平排版出现的频率
-            mask=Background_Picture,  # 设置背景图片
+            # mask=Background_Picture,  # 设置背景图片
             # contour_width=2,  # 给形状周围加粗
             # contour_color="red",  # 形状边缘线的颜色设置为红色
-            scale=1.5,  # 显示设置为原来画布的1.5倍
+            scale=3,  # 显示设置为原来画布的1.5倍
             max_words=500,  # 显示的最大的词的个数设置为 500
-            background_color="white",  # 背景设置成白色
+            background_color="black",  # 背景设置成白色
             collocations=True,  # 包括两个词的搭配
-            random_state=100  # 100种配色方案
+            random_state=200  # 100种配色方案
         )
         wc.generate_from_frequencies(self.Freq_Dict)
         #  改变字体颜色
@@ -178,7 +178,9 @@ class ThemeAnalysis(object):
 
 
 if __name__ == "__main__":
-    Analysis = ThemeAnalysis("2018-11-04", 1, 0)  # Mode =1 Means Get Rank 前%5的帖子
+    print('start...')
+    Analysis = ThemeAnalysis("2018-11-15", 1, 1)  # Mode =1 Means Get Rank 前%5的帖子
+    print('')
     # Mode=Others Means Get All the Post
     Analysis.visualize_cloud()
 

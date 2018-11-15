@@ -16,7 +16,7 @@ class GetData(object):
     def connection():
         client = MongoClient('mongodb://%s:%s@%s:%s/' % (settings.User_Id, settings.User_Password, settings.Server_IP,
                                                          settings.Server_Port))  # 连接到服务器
-        db_list = client.list_database_names()
+        db_list = client.database_names()
         for db in db_list:  # 找到Spider数据库
             if db == 'HUPU_DB':
                 data_base = client.get_database(db)
@@ -24,7 +24,7 @@ class GetData(object):
                 continue
         # 异常处理
         try:
-            coll_names = data_base.list_collection_names()  # 列举数据库中的集合
+            coll_names = data_base.collection_names()  # 列举数据库中的集合
         except ValueError:
             raise
         # 只有一个collection
