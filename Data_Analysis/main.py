@@ -1,4 +1,5 @@
 from Theme_Analysis.theme_analysis import ThemeAnalysis
+from Theme_Analysis.visualization import WordCloudGenerater
 import settings
 
 if __name__ == "__main__":
@@ -6,3 +7,4 @@ if __name__ == "__main__":
     N = eval(input("请输入查询天数:\nN"))
     Mode = eval(input("请输入查询模式(1代表先Rank再查询)\nMode"))
     Analysis = ThemeAnalysis(Date, N, Mode)
+    Output = WordCloudGenerater(Analysis.freq_dict, Analysis.date_list, Analysis.query_num)

@@ -1,7 +1,7 @@
 def date_increase(List):
     '''
     Input the Date_List
-    Output the Changed_List
+    Output the Changed_List in the next day of the input
     '''
     if List[0] % 400 == 0 and (List[0] % 4 == 0 and List[0] % 100 != 0):  # 是闰年
         if List[1] == 2:

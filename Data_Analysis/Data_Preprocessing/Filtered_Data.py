@@ -1,4 +1,4 @@
-from Data_Preprocessing.Get_Data import GetData
+from Data_Preprocessing.Get_Data import DataGetter
 from Data_Preprocessing.Date_Increase import date_increase
 
 
@@ -6,49 +6,50 @@ from Data_Preprocessing.Date_Increase import date_increase
 # 对于不同日期的帖子 很难确定回复数 点亮数 浏览数的门限值
 
 
-def filtered_data(Date, N, Mode):
+def filtered_data(date, n, mode):
     '''
-    :param Date: Query 的初始日期
-    :param N: 需要查询的天数
-    :return: Collection, Size_Post, Date_List
+    :param date: Query 的初始日期
+    :param n: 需要查询的天数
+    :param mode:查询模式选择
+    :return: Collection：返回所有的帖子的集合, Size_Post:返回的每天的帖子的数量, Date_List：查询的日期列表
     '''
     # 存储分配
-    Collection = []
-    Size_Post = []
-    Date_List = []
+    collection = []
+    size_post = []
+    date_list = []
     i = 0  # Control Iteration Times
-    while i < N:
-        Filter_Conf1 = {"crawl_time": {"$regex": r"^.*%s.*$" % Date}, "reply_num": {"$gte": 0},
-                       "bright_reply_num": {"$gte": 0}, "browse_num": {"$gte": 0}}
-        Filter_Conf2 = {"url": 0, "publish_time": 0}  # 确定需要映射的返回参数
-        Get_Object = GetData(Filter_Conf1, Filter_Conf2, Mode)  # 创建GetData实例
-        Table, Size = Get_Object.Table, Get_Object.Size  # 通过属性访问
-        if Size == 0:
-            if i != N:
-                print("%s Out Date Index" % Date)
-            break
+    while i < n:
+        query_factor = {"crawl_time": {"$regex": r"^.*%s.*$" % date}, "reply_num": {"$gt": 0},
+                       "bright_reply_num": {"$gt": 0}, "browse_num": {"$gt": 0}}
+        result_format = {"url": 0, "publish_time": 0}  # 确定需要映射的返回参数
+        get_object = DataGetter(date, query_factor, result_format, mode)  # 创建GetData实例
+        table, size = get_object.table, get_object.size  # 通过属性访问
+        if size == 0:  # 如果获取到的帖子的长度为0：日期超出了集合的Index
+            #  触发日期Index 不对的异常
+            if i != n:
+                raise Exception("%s Out Date Index" % date)
         else:
-            print("Is Collecting the %d Day:" % (i+1))
-            Collection.append(Table)
-            Size_Post.append(Size)
-            Date_List.append(Date)
+            collection.append(table)
+            size_post.append(size)
+            date_list.append(date)
+            print("Collect the %d Day Over:" % (i + 1))
             i = i + 1
-        List = Date.split('-')
-        List = [int(x) for x in List]  # 字符串转整型变量
+        temp_list = date.split('-')
+        temp_list = [int(x) for x in temp_list]  # 字符串转整型变量
         # 天数加一 假定数据中的日期的Value是正确的
-        List = date_increase(List)  # 得到数据中日期增加的列表
-        for j in range(0, len(List)):
+        temp_list = date_increase(temp_list)  # 得到数据中日期增加的列表
+        for j in range(0, len(temp_list)):
             if j == 0:
-                List[j] = str(List[j])
+                temp_list[j] = str(temp_list[j])
             else:
-                if 0 < List[j] < 10:
-                    List[j] = str("0%s" % List[j])  # 保证日期的格式的一致性
+                if 0 < temp_list[j] < 10:
+                    temp_list[j] = str("0%s" % temp_list[j])  # 保证日期的格式的一致性
                 else:
-                    List[j] = str(List[j])
-        Separator = '-'
-        List = Separator.join(List)
-        Date = List
-    return Collection, Size_Post, Date_List
+                    temp_list[j] = str(temp_list[j])
+        separator = '-'
+        temp_list = separator.join(temp_list)
+        date = temp_list
+    return collection, size_post, date_list
 
 
 
