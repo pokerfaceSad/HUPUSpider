@@ -108,7 +108,7 @@ class ThemeAnalysis(object):
         for post_index in range(0, len(self.title_list)):
             for word_index in range(0, len(self.title_list[post_index])):
                 breakflag = False
-                if self.title_list[post_index][word_index].upper() in [key.lower for key in list(freq_dict.keys())]:
+                if self.title_list[post_index][word_index].lower() in [key.lower for key in list(freq_dict.keys())]:
                     #  如果不同的帖子之间的关键词有重复的 将两个帖子的权重相加
                     freq_dict["%s" % self.title_list[post_index][word_index]] = \
                         freq_dict["%s" % self.title_list[post_index][word_index]] + self.weights_list[post_index]
