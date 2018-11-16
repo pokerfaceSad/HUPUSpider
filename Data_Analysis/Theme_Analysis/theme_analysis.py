@@ -61,13 +61,16 @@ class ThemeAnalysis(object):
                                                                     (bright_reply_Index + 1)]["bright_num"])
                 # 替换一些无意义的符号 正则表达式最好是分开来写 避免耗时太长的问题
                 temp = "".join(
-                    jieba.lcut(re.sub(r"([【】&*￥#$~-——/<>=%_(:3」∠)_❤\+\-\[\].·]+)", "", self.collection[i][j]["post_content"]
+                    jieba.lcut(re.sub(r"([【】&*￥#$~-——/<>=%_(:3」∠)_❤\+\-\[\].·]+)", "",
+                                      self.collection[i][j]["post_content"]
                                       + temp_str), cut_all=False))
                 #  去除帖子中的一些 ZT，ZS，TX, JR LZ \n\r\f\v等无意义的字符
                 temp = re.sub(r"([Zz][Tt]|[Zz][Ss]|[Tt][Xx]|[Jj][Rr]|[Ll][Zz]|[Mm][Jj]|[\s]{1,3})", "", temp)
                 #  去除帖子中包含的网址 由***发表在虎扑步行街**等无意义的句子 非贪心匹配
                 #  [\u4e00-\u9fa5]用来匹配汉字
                 temp = re.sub(r"(由([\u4e00-\u9fa5]|[A-Za-z0-9])+?发表在虎扑步行街.+?com.{1,5})", "", temp)
+                temp = re.sub(r"(由([\u4e00-\u9fa5]|[A-Za-z0-9])+?发表在虎扑篮球湿乎乎的话题.+?vote)", "", temp)
+                # print(temp)
                 temp = re.sub(r"(无法播放，浏览器版本过低，请升级浏览器或者使用其他浏览器)", "", temp)
                 temp = re.sub(r"(发自虎扑[A-Za-z]+?客户端)", "", temp)
                 temp = re.sub(r"(发自手机虎扑.+?com)", "", temp)
@@ -105,16 +108,16 @@ class ThemeAnalysis(object):
         for post_index in range(0, len(self.title_list)):
             for word_index in range(0, len(self.title_list[post_index])):
                 breakflag = False
-                if self.title_list[post_index][word_index] in list(freq_dict.keys()):
+                if self.title_list[post_index][word_index].upper() in [key.lower for key in list(freq_dict.keys())]:
                     #  如果不同的帖子之间的关键词有重复的 将两个帖子的权重相加
                     freq_dict["%s" % self.title_list[post_index][word_index]] = \
                         freq_dict["%s" % self.title_list[post_index][word_index]] + self.weights_list[post_index]
                     continue
                 for keyvalue in list(freq_dict.keys()):
-                    if self.title_list[post_index][word_index] in keyvalue:
+                    if self.title_list[post_index][word_index].lower() in keyvalue.lower():
                         breakflag = True
                         break
-                    if keyvalue in self.title_list[post_index][word_index]:
+                    if keyvalue.lower() in self.title_list[post_index][word_index].lower():
                         breakflag = True
                         break
                 if breakflag:
