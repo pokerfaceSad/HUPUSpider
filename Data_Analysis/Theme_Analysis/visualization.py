@@ -29,7 +29,7 @@ class WordCloudGenerater(object):
         # 依据Dict的大小动态调整词云的大小
         # 300词设置图片初始大小1200*600
         wc = WordCloud(
-            font_path="%s" % settings.Font_Path,  # 字体采用微软雅黑
+            font_path = settings.Project_Path + "Fonts/" + settings.Font_Path,  # 字体采用微软雅黑
             prefer_horizontal=0.5,  # 词语水平排版出现的频率
             width=round(len(self.freq_dict) / 300 * 1200),  # 设置图片大小
             height=round(len(self.freq_dict) / 300 * 600),

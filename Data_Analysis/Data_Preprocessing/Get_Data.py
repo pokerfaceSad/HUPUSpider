@@ -20,7 +20,7 @@ class DataGetter(object):
         '''
         client = MongoClient('mongodb://%s:%s@%s:%s/' % (settings.User_Id, settings.User_Password, settings.Server_IP,
                                                          settings.Server_Port))  # 连接到服务器
-        db_list = client.list_database_names()
+        db_list = client.database_names()
         for db in db_list:  # 找到Spider数据库
             if db == "%s" % settings.DataBase_Name:
                 data_base = client.get_database(db)
