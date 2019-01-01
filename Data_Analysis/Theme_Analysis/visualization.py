@@ -36,7 +36,7 @@ class WordCloudGenerater(object):
             # mask=Background_Picture,  # 设置背景图片
             # contour_width=2,  # 给形状周围加粗
             # contour_color="red",  # 形状边缘线的颜色设置为红色
-            # scale=1,  # 显示设置为原来画布的3倍 针对于Mask_Image有效
+            scale=2,  # 显示设置为原来画布的3倍 针对于Mask_Image有效
             max_words=500,  # 显示的最大的词的个数设置为 500
             background_color="black",  # 背景设置成白色
             random_state=100,  # 100种配色方案

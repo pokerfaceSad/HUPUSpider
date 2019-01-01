@@ -41,7 +41,9 @@ class DataGetter(object):
         docs = self.collection.find(self.query_factor, self.result_format)
         size = docs.count()
         print("Query Database Finished: Date = %s, Size=%d" % (self.date, size))
+        print("Start sort posts...")
         docs = docs.sort([("bright_reply_num", -1), ("reply_num", -1), ("browse_num", -1)])
+        print("Sort posts finshed")
         #  先按照帖子的回复数 再按照点亮数和浏览量进行 降序
         for i in range(0, round(alpha*size)):  # 取当天的总的帖子的Rank前 5% 的数据
             Dict = docs[i]
