@@ -6,7 +6,6 @@
 ![2018-11-11分析结果][1]
 # 结构
 数据采集使用Scrapy框架，存储使用MongoDB，数据处理采用[jieba][3]和[WordCloud][4]
-![系统结构][2]
 
 # 数据抓取
 爬虫使用[Scrapy框架][5]编写，采用[SpiderKeeper][6]进行管理，设置一个定时任务每半小时抓取论坛首页的所有帖子的
@@ -73,11 +72,9 @@
 ## 三、结果可视化
    使用[WordCloud][8]将上一步骤得到的关键词-权重字典生成词云
 
-# To Be Continued
 
 
   [1]: https://raw.githubusercontent.com/pokerfaceSad/HUPUSpider/master/img/2018-11-11%E5%88%86%E6%9E%90%E7%BB%93%E6%9E%9C.png
-  [2]: https://raw.githubusercontent.com/pokerfaceSad/HUPUSpider/master/img/struct.png
   [3]: https://github.com/fxsjy/jieba
   [4]: http://amueller.github.io/word_cloud/index.html
   [5]: https://github.com/scrapy/scrapy
